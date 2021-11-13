@@ -96,6 +96,11 @@ async function run() {
       const result = await usersCollection.insertOne(item);
       res.json(result);
     });
+    // get users
+    app.get('/users', async (req, res) => {
+      const result = await usersCollection.find({}).toArray();
+      res.send(result);
+    });
     // post user as admin
     app.put('/users/admin', async (req, res) => {
       const user = req.body;
@@ -104,6 +109,7 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.json(result);
     });
+
     // find admin
     app.get('/users/:email', async (req, res) => {
       const email = req.params.email;
