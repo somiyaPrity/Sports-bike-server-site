@@ -37,6 +37,12 @@ async function run() {
       const result = await ordersCollection.insertOne(item);
       res.json(result);
     });
+    // post review
+    app.post('/review', async (req, res) => {
+      const item = req.body;
+      const result = await reviewsCollection.insertOne(item);
+      res.json(result);
+    });
     // get order data based on email
     app.get('/order/:email', async (req, res) => {
       const email = req.params.email;
@@ -67,6 +73,17 @@ async function run() {
       const updateDoc = { $set: { role: 'admin' } };
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.json(result);
+    });
+    // find admin
+    app.get('/users/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      let isAdmin = false;
+      if (user?.role === 'admin') {
+        isAdmin = true;
+      }
+      res.json({ admin: isAdmin });
     });
 
     // app.get('/appointments', async (req, res) => {
