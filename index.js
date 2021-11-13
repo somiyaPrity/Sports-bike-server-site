@@ -31,17 +31,31 @@ async function run() {
       const result = await productsCollection.find({}).toArray();
       res.send(result);
     });
+    // delete a bike
+    app.delete('/bikes/:id', async (req, res) => {
+      const result = productsCollection.deleteOne({
+        _id: ObjectId(req.params.id),
+      });
+
+      res.json(result);
+    });
+    // post more bikes
+    app.post('/bikes', async (req, res) => {
+      const item = req.body;
+      const result = await productsCollection.insertOne(item);
+      res.json(result);
+    });
     // post all order
     app.post('/order', async (req, res) => {
       const item = req.body;
       const result = await ordersCollection.insertOne(item);
       res.json(result);
     });
-    // post review
-    app.post('/review', async (req, res) => {
-      const item = req.body;
-      const result = await reviewsCollection.insertOne(item);
-      res.json(result);
+
+    // get all orders
+    app.get('/order', async (req, res) => {
+      const result = await ordersCollection.find({}).toArray();
+      res.send(result);
     });
     // get order data based on email
     app.get('/order/:email', async (req, res) => {
@@ -50,6 +64,22 @@ async function run() {
       const cursor = ordersCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
+    });
+    // update order status
+    app.put('/order/:id', async (req, res) => {
+      const id = req.params.id;
+      const updatedStatus = req.body;
+      const filter = {
+        _id: ObjectId(id),
+      };
+      const doc = {
+        $set: {
+          status: updatedStatus.status,
+        },
+      };
+      const result = await ordersCollection.updateOne(filter, doc);
+
+      res.json(result);
     });
     // delete an order
     app.delete('/order/:id', async (req, res) => {
@@ -85,26 +115,18 @@ async function run() {
       }
       res.json({ admin: isAdmin });
     });
+    // post review
+    app.post('/review', async (req, res) => {
+      const item = req.body;
+      const result = await reviewsCollection.insertOne(item);
+      res.json(result);
+    });
+    // get all review
+    app.get('/review', async (req, res) => {
+      const result = await reviewsCollection.find({}).toArray();
+      res.send(result);
+    });
 
-    // app.get('/appointments', async (req, res) => {
-    //   const email = req.query.email;
-    //   const date = new Date(req.query.date).toLocaleDateString();
-
-    //   const query = { email: email, date: date };
-
-    //   const cursor = appointmentsCollection.find(query);
-    //   const appointments = await cursor.toArray();
-    //   res.json(appointments);
-    //   res.json('appointment');
-    // });
-
-    // app.post('/appointments', async (req, res) => {
-    //   const appointment = req.body;
-    //   console.log(appointment);
-    //   const result = await appointmentsCollection.insertOne(appointment);
-    //   // console.log(result);
-    //   res.json(result);
-    // });
     console.log('function running');
   } finally {
     // await client.close();
